@@ -32,7 +32,7 @@ public class ClinicalNote {
   public String getNoteContent() {
     return noteContent;
   }
-  public void setNoteContent(String noteContent) {|
+  public void setNoteContent(String noteContent) {
     this.noteContent = noteContent;
   }
 
