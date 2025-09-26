@@ -6,6 +6,7 @@ package com.github.matthewmartin117.healthcare_api;
 import java.sql.Date;
 
 public class BiologicalSample {
+  private String id;
   private String patientID;
   private String sampleType; // e.g. blood, urine, tissue
   private Date collectionDate; // Date the sample was collected

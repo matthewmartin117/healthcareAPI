@@ -6,6 +6,7 @@ package com.github.matthewmartin117.healthcare_api;
 import java.sql.Date;
 
 public class ClinicalNote {
+  private String id;
   private String patientID;
   private String provider;
   private Date dateCreated;
@@ -20,6 +21,7 @@ public class ClinicalNote {
   }
 
   //getters and setters
+  public String getId() { return id; }
   public String getPatientID() {
     return patientID;
   }
