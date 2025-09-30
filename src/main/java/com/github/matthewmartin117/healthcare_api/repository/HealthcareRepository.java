@@ -1,7 +1,15 @@
-package com.github.matthewmartin117.healthcare_api;
-
+package com.github.matthewmartin117.healthcare_api.repository;
 import java.util.*;
 
+import com.github.matthewmartin117.healthcare_api.models.BiologicalSample;
+import com.github.matthewmartin117.healthcare_api.models.ClinicalNote;
+import com.github.matthewmartin117.healthcare_api.models.Patient;
+
+// annotated as a service for Spring to manage
+// indicates that this bean provides business functionalities
+// spring automattically manages its lifecycle and allows it to be injected into other components
+import org.springframework.stereotype.Service;
+@Service
 public class HealthcareRepository {
 
     // Stores patients according to their patientID
@@ -25,8 +33,9 @@ public class HealthcareRepository {
     ============================ */
 
     // Create patient: takes a Patient object and adds it to the patientStore
-    public void createPatient(Patient patient) {
+    public Patient createPatient(Patient patient) {
       patientStore.put(patient.getPatientID(), patient);
+      return patient;
     }
 
     // Get patient by ID: looks up a patient ID and returns the corresponding patient object
@@ -35,8 +44,9 @@ public class HealthcareRepository {
     }
 
     // Update patient: replaces the existing patient record with an updated Patient object
-    public void updatePatient(String patientID, Patient updatedPatient) {
+    public Patient updatePatient(String patientID, Patient updatedPatient) {
       patientStore.put(patientID, updatedPatient);
+      return updatedPatient;
     }
 
     // Delete patient: removes a patient and associated data from all stores
@@ -56,11 +66,12 @@ public class HealthcareRepository {
     ============================ */
 
     // Create biological sample: adds a BiologicalSample to the store using patientID
-    public void createBiologicalSample(BiologicalSample sample) {
+    public BiologicalSample createBiologicalSample(BiologicalSample sample) {
       String patientID = sample.getPatientID();
       biologicalSampleStore
             .computeIfAbsent(patientID, k -> new ArrayList<>())
             .add(sample);
+            return sample;
     }
 
     // Get biological samples by patient ID: returns the list of samples for a patient
@@ -68,17 +79,30 @@ public class HealthcareRepository {
       return biologicalSampleStore.getOrDefault(patientID, Collections.emptyList());
     }
 
+    // Get a specific biological sample by its ID for a patient
+    public BiologicalSample getBiologicalSampleByID(String patientID, String sampleID) {
+      List<BiologicalSample> samples = biologicalSampleStore.get(patientID);
+      if (samples != null) {
+          for (BiologicalSample sample : samples) {
+              if (sample.getId().equals(sampleID)) {
+                  return sample;
+              }
+          }
+      }
+      return null; // Sample not found
+    }
+
     // Update biological sample: replaces the sample at the specified index
-    public void updateBiologicalSample(String patientID, String sampleID, BiologicalSample updatedSample){
+    public BiologicalSample updateBiologicalSample(String patientID, String sampleID, BiologicalSample updatedSample){
       List<BiologicalSample> samples = biologicalSampleStore.get(patientID);
       if (samples != null) {
           for (int i = 0; i < samples.size(); i++) {
               if (samples.get(i).getId().equals(sampleID)) {
                   samples.set(i, updatedSample);
-                  return;
-              }
+                }
           }
       }
+      return updatedSample;
     }
 
 
@@ -95,11 +119,12 @@ public class HealthcareRepository {
     ============================ */
 
     // Create clinical note: adds a ClinicalNote to the store using patientID
-    public void createClinicalNote(ClinicalNote note) {
+    public ClinicalNote createClinicalNote(ClinicalNote note) {
       String patientID = note.getPatientID();
       clinicalNoteStore
             .computeIfAbsent(patientID, k -> new ArrayList<>())
             .add(note);
+            return note;
     }
 
     // Get clinical notes by patient ID: returns the list of notes for a patient
@@ -107,20 +132,33 @@ public class HealthcareRepository {
       return clinicalNoteStore.getOrDefault(patientID, Collections.emptyList());
     }
 
+    // Get a specific clinical note by its ID for a patient
+    public ClinicalNote getClinicalNoteByID(String patientID, String noteID) {
+      List<ClinicalNote> notes = clinicalNoteStore.get(patientID);
+      if (notes != null) {
+          for (ClinicalNote note : notes) {
+              if (note.getId().equals(noteID)) {
+                  return note;
+              }
+          }
+      }
+      return null; // Note not found
+    }
+
     // Update clinical note: replaces the note at the specified index
-    public void updateClinicalNote(String patientID, String noteID, ClinicalNote updatedNote){
+    public ClinicalNote updateClinicalNote(String patientID, String noteID, ClinicalNote updatedNote){
       List<ClinicalNote> notes = clinicalNoteStore.get(patientID);
       if (notes != null) {
           for (int i = 0; i < notes.size(); i++) {
               if (notes.get(i).getId().equals(noteID)) {
                   notes.set(i, updatedNote);
-                  return;
               }
           }
       }
+      return updatedNote;
     }
 
-    // Delete clinical note: removes a note at the specified index
+    // Delete clinical note: removes a note at the specified ID
     public void deleteClinicalNote(String patientID, String noteID){
     List<ClinicalNote> notes = clinicalNoteStore.get(patientID);
     if (notes != null) {

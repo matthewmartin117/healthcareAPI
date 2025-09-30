@@ -1,9 +1,11 @@
-package com.github.matthewmartin117.healthcare_api;
+package com.github.matthewmartin117.healthcare_api.models;
 /* This class represents a clinical note about a patient.
  * Contains metadata about the note and the content of the note itself.
  */
 
-import java.sql.Date;
+import java.util.Date;
+import java.util.UUID;
+import java.util.*;
 
 public class ClinicalNote {
   private String id;
@@ -13,10 +15,11 @@ public class ClinicalNote {
   private String noteContent;
 
   // Constructor
-  public ClinicalNote(String patientID, String provider, Date dateCreated, String noteContent) {
+  public ClinicalNote(String patientID, String provider, String noteContent) {
+    this.id = UUID.randomUUID().toString();
     this.patientID = patientID;
     this.provider = provider;
-    this.dateCreated = dateCreated;
+    this.dateCreated = new Date();
     this.noteContent = noteContent;
   }
 
@@ -24,6 +27,9 @@ public class ClinicalNote {
   public String getId() { return id; }
   public String getPatientID() {
     return patientID;
+  }
+  public void setPatientID(String patientID) {
+    this.patientID = patientID;
   }
   public String getProvider() {
     return provider;

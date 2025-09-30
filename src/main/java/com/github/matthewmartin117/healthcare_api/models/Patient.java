@@ -1,5 +1,4 @@
-package com.github.matthewmartin117.healthcare_api;
-import java.sql.Date;
+package com.github.matthewmartin117.healthcare_api.models;
 import java.util.*;
 /* This class represents a rrecord of a specific patient
  * Essential indentifiers and demographic information
@@ -51,19 +50,31 @@ public class Patient {
   }
 
   public List<ClinicalNote> getClinicalNotes() {
-    return clinicalNotes;
-  }
+    return Collections.unmodifiableList(clinicalNotes);
+}
 
   public void addClinicalNote(ClinicalNote note) {
     this.clinicalNotes.add(note);
   }
 
   public List<BiologicalSample> getBiologicalSamples() {
-    return biologicalSamples;
+    return Collections.unmodifiableList(biologicalSamples);
   }
 
   public void addBiologicalSample(BiologicalSample sample) {
     this.biologicalSamples.add(sample);
   }
+
+  @Override
+public String toString() {
+    return "Patient{" +
+            "id='" + patientID + '\'' +
+            ", name='" + name + '\'' +
+            ", dateOfBirth=" + dateOfBirth +
+            ", contactInformation=" + contactInformation +
+            ", clinicalNotes=" + clinicalNotes +
+            ", biologicalSamples=" + biologicalSamples +
+            '}';
+}
 
 }
