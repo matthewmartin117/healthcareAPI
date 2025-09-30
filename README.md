@@ -1,6 +1,5 @@
-Absolutely! Here's a professional, clear README draft tailored to your Healthcare API project. You can expand or adjust it with screenshots, badges, or additional instructions later:
 
-Healthcare API
+# Healthcare API
 
 A simple RESTful API for managing patients, clinical notes, and biological samples. Built using Spring Boot, this project demonstrates CRUD operations and nested resource management for healthcare-related data.
 
