@@ -1,3 +1,21 @@
+### Build
+/target/
+*.class
+
+### IDE
+.idea/
+.vscode/
+*.iml
+
+### macOS
+.DS_Store
+
+### Logs
+*.log
+full-test-debug.log
+
+### Others
+/out/
 HELP.md
 target/
 .mvn/wrapper/maven-wrapper.jar
