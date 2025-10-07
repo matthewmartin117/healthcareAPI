@@ -19,7 +19,7 @@ import jakarta.persistence.Table;
  * Any biological samples taken from the patient
  */
 @Entity // marks this as a JPA entity to be mapped to a database table
-@Table(name = "patients") // specifies the table name in the database , otherwise defaults to class name
+@Table(name = "patient") // specifies the table name in the database , otherwise defaults to class name
 public class Patient {
 // properties
   // Essential identifiers
