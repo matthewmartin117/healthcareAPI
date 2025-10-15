@@ -4,8 +4,9 @@ package com.github.matthewmartin117.healthcare_api.models;
  */
 
 import java.util.Date;
-
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -15,7 +16,8 @@ import jakarta.persistence.Table;
 @Table(name = "biological_samples")
 public class BiologicalSample {
   @Id
-  private String Id;
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long Id;
   private String sampleType; // e.g. blood, urine, tissue
   private Date collectionDate; // Date the sample was collected
   private String reasonCollected;
@@ -25,8 +27,7 @@ public class BiologicalSample {
   private Patient patient;
 
   // Constructor
-  public BiologicalSample(String Id, Patient patient, String sampleType, Date collectionDate, String reasonCollected) {
-    this.Id = Id;
+  public BiologicalSample(Patient patient, String sampleType, Date collectionDate, String reasonCollected) {
     this.patient = patient;
     this.sampleType = sampleType;
     this.collectionDate = collectionDate;
@@ -38,8 +39,8 @@ public BiologicalSample(){
 }
     //getters and setters
 
-  public String getSampleId() { return Id; }
-  public void setSampleId(String Id) {this.Id =Id;}
+  public Long getSampleId() { return Id; }
+  public void setSampleId(Long Id) {this.Id =Id;}
 
   public Patient getPatient() {
     return patient;

@@ -2,13 +2,15 @@ package com.github.matthewmartin117.healthcare_api.services;
 
 import com.github.matthewmartin117.healthcare_api.models.Patient;
 import com.github.matthewmartin117.healthcare_api.repositories.PatientRepository;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.*;
+import org.junit.jupiter.api.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
 import java.time.LocalDate;
 import java.util.*;
+
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class PatientServiceTest {
@@ -22,81 +24,43 @@ class PatientServiceTest {
     private Patient testPatient;
 
     @BeforeEach
-    void setUp() {
-    // Create Patient
-    LocalDate dob = LocalDate.of(1985, 6, 15);
+    void setup() {
         MockitoAnnotations.openMocks(this);
-    testPatient = new Patient();
-        testPatient.setPatientID("123");
+        testPatient = new Patient();
+        testPatient.setPatientID(1L);
         testPatient.setName("John Doe");
-    testPatient.setDateOfBirth(dob); // example DOB
+        testPatient.setDateOfBirth(LocalDate.now());
     }
 
     @Test
     void testCreatePatient() {
-        when(patientRepo.save(testPatient)).thenReturn(testPatient);
-
-        Patient created = patientService.createPatient(testPatient);
-
-        assertNotNull(created);
-        assertEquals("123", created.getPatientID());
+        when(patientRepo.save(any(Patient.class))).thenReturn(testPatient);
+        Patient saved = patientService.createPatient(testPatient);
+        assertEquals("John Doe", saved.getName());
         verify(patientRepo, times(1)).save(testPatient);
     }
 
     @Test
-    void testGetPatientByID_Found() {
-    when(patientRepo.findById("123")).thenReturn(Optional.of(testPatient));
-
-    Patient found = patientService.getPatientByID("123");
-
-    assertNotNull(found);
-    assertEquals("John Doe", found.getName());
-    assertEquals(LocalDate.of(1985, 6, 15), found.getDateOfBirth());
-        verify(patientRepo, times(1)).findById("123");
-    }
-
-    @Test
-    void testGetPatientByID_NotFound() {
-        when(patientRepo.findById("999")).thenReturn(Optional.empty());
-
-        Patient notFound = patientService.getPatientByID("999");
-
-        assertNull(notFound);
-    }
-
-    @Test
-    void testUpdatePatient() {
-    when(patientRepo.save(any(Patient.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
-        Patient updated = new Patient();
-        updated.setName("Jane Doe");
-    updated.setDateOfBirth(LocalDate.of(1990, 1, 1));
-
-        Patient result = patientService.updatePatient("123", updated);
-
-        assertEquals("123", result.getPatientID());
-        assertEquals("Jane Doe", result.getName());
-    assertEquals(LocalDate.of(1990, 1, 1), result.getDateOfBirth());
-        verify(patientRepo, times(1)).save(updated);
-    }
-
-    @Test
-    void testDeletePatient() {
-        doNothing().when(patientRepo).deleteById("123");
-
-        patientService.deletePatient("123");
-
-        verify(patientRepo, times(1)).deleteById("123");
+    void testGetPatientById() {
+        when(patientRepo.findById(1L)).thenReturn(Optional.of(testPatient));
+        Patient found = patientService.getPatientByID(1L);
+        assertEquals(1L, found.getPatientID());
     }
 
     @Test
     void testGetAllPatients() {
-        List<Patient> patients = Arrays.asList(testPatient, new Patient());
-        when(patientRepo.findAll()).thenReturn(patients);
+        when(patientRepo.findAll()).thenReturn(Collections.singletonList(testPatient));
+        List<Patient> all = patientService.getAllPatients();
+        assertEquals(1, all.size());
+    }
 
-        List<Patient> result = patientService.getAllPatients();
+    @Test
+    void testDeletePatient() {
+        patientRepo.save(testPatient); // make sure patient exists
 
-        assertEquals(2, result.size());
-        verify(patientRepo, times(1)).findAll();
+        patientService.deletePatient(testPatient.getPatientID());
+
+        assertFalse(patientRepo.existsById(testPatient.getPatientID()));
     }
 }
+

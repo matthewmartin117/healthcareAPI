@@ -20,16 +20,16 @@ public class PatientService {
     return patientRepo.save(patient);
   }
 
-  public Patient getPatientByID(String id){
-    return patientRepo.findById(id).orElse(null);
+  public Patient getPatientByID(Long id){
+    return patientRepo.findById(id).orElse( null);
   }
 
-  public Patient updatePatient(String id, Patient updatedPatient){
+  public Patient updatePatient(Long id, Patient updatedPatient){
     updatedPatient.setPatientID(id);
     return patientRepo.save(updatedPatient);
   }
 
-  public void deletePatient(String id){
+  public void deletePatient(Long id){
     patientRepo.deleteById(id);
   }
 

@@ -2,16 +2,17 @@ package com.github.matthewmartin117.healthcare_api.models;
 import java.time.LocalDate;
 import java.util.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MapKeyColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.GenerationType;
 /* This class represents a rrecord of a specific patient
  * Essential indentifiers and demographic information
  * Contact information
@@ -24,7 +25,8 @@ public class Patient {
 // properties
   // Essential identifiers
   @Id
-  private String patientID; // Unique patient identifier
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private long patientID; // Unique patient identifier
 
   private String name;
   private LocalDate dateOfBirth;
@@ -44,8 +46,7 @@ public class Patient {
   private List <BiologicalSample> biologicalSamples; // List of biological samples
 
   // Constructor
-  public Patient(String patientID, String name, LocalDate dateOfBirth, Map<String, String> contactInformation) {
-    this.patientID = patientID;
+  public Patient(String name, LocalDate dateOfBirth, Map<String, String> contactInformation) {
     this.name = name;
     this.dateOfBirth = dateOfBirth;
     this.contactInformation = contactInformation;
@@ -61,10 +62,10 @@ public class Patient {
     }
 
   // getters and setters
-  public String getPatientID() {
+  public Long getPatientID() {
     return patientID;
 }
-  public void setPatientID(String patientID){
+  public void setPatientID(Long patientID){
     this.patientID = patientID;
   }
 

@@ -12,11 +12,20 @@ public class DataLoader {
     public CommandLineRunner loadUsers(UserRepository userRepo, PasswordEncoder passwordEncoder) {
         return args -> {
             if (userRepo.findByUsername("admin").isEmpty()) {
+                // create an admin user
                 AppUser admin = new AppUser();
                 admin.setUsername("admin");
                 admin.setPassword(passwordEncoder.encode("adminpassword"));
-                admin.setRoles("ROLE_ADMIN,ROLE_USER");
+                admin.setRoles("ROLE_ADMIN");
                 userRepo.save(admin);
+                System.out.println("Admin user created: admin/adminpassword");
+                // create a regular user
+                AppUser user = new AppUser();
+                user.setUsername("user");
+                user.setPassword(passwordEncoder.encode("userpassword"));
+                user.setRoles("ROLE_USER");
+                userRepo.save(user);
+                System.out.println("Regular user created: user/userpassword");
             }
         };
     }

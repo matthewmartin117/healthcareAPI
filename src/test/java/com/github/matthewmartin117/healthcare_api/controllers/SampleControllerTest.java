@@ -11,13 +11,15 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-
 import java.time.LocalDate;
 import java.util.HashMap;
-
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import com.github.matthewmartin117.healthcare_api.models.AppUser;
+import com.github.matthewmartin117.healthcare_api.repositories.UserRepository;
+import com.github.matthewmartin117.healthcare_api.services.JwtService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -28,33 +30,72 @@ public class SampleControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private BiologicalSampleRepository sampleRepo;
+    private PatientRepository patientRepo;
 
     @Autowired
-    private PatientRepository patientRepo;
+    private UserRepository userRepo;
+
+    @Autowired
+    private JwtService jwtService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private ObjectMapper objectMapper;
 
-    private Patient testPatient;
+    @Autowired
+    private BiologicalSampleRepository sampleRepo;
+
     private BiologicalSample testSample;
+    private Patient testPatient;
+    private AppUser testUser;
+    private AppUser testAdmin;
+    private String userToken;
+    private String adminToken;
 
     @BeforeEach
     void setup() {
-        sampleRepo.deleteAll();
         patientRepo.deleteAll();
+        userRepo.deleteAll();
 
-    testPatient = new Patient("P001", "John Doe", LocalDate.now(), new HashMap<>());
+        // Create test users
+        testAdmin = new AppUser();
+        testAdmin.setUsername("admin");
+        testAdmin.setPassword(passwordEncoder.encode("adminpass"));
+        testAdmin.setRoles("ADMIN");
+        userRepo.save(testAdmin);
+
+        testUser = new AppUser();
+        testUser.setUsername("user");
+        testUser.setPassword(passwordEncoder.encode("userpass"));
+        testUser.setRoles("USER");
+        userRepo.save(testUser);
+
+        // Generate JWT tokens
+        adminToken = "Bearer " + jwtService.generateToken(testAdmin.getUsername());
+        userToken = "Bearer " + jwtService.generateToken(testUser.getUsername());
+
+        // Create a sample patient
+        testPatient = new Patient();
+        testPatient.setName("John Doe");
         patientRepo.save(testPatient);
 
-    testSample = new BiologicalSample("S001", testPatient, "Blood", new java.util.Date(), "Routine check");
+        // create a sample biological sample
+        testSample = new BiologicalSample();
+        testSample.setPatient(testPatient);
+        testSample.setSampleType("Blood");
+        testSample.setCollectionDate(new java.util.Date());
+        testSample.setReasonCollected("Routine Checkup");
         sampleRepo.save(testSample);
+
     }
 
     @Test
     @Order(1)
     void testGetAllSamples() throws Exception {
-        mockMvc.perform(get("/patients/{patientId}/biological-samples", testPatient.getPatientID()))
+        mockMvc.perform(get("/patients/{patientId}/biological-samples", testPatient.getPatientID())
+        .header("Authorization", userToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].sampleType", is(testSample.getSampleType())));
@@ -64,7 +105,8 @@ public class SampleControllerTest {
     @Order(2)
     void testGetSampleById() throws Exception {
         mockMvc.perform(get("/patients/{patientId}/biological-samples/{sampleId}",
-                        testPatient.getPatientID(), testSample.getSampleId()))
+                        testPatient.getPatientID(), testSample.getSampleId())
+                .header("Authorization", userToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.sampleType", is(testSample.getSampleType())));
     }
@@ -72,8 +114,14 @@ public class SampleControllerTest {
     @Test
     @Order(3)
     void testCreateSample() throws Exception {
-    BiologicalSample newSample = new BiologicalSample("S002", testPatient, "Urine", new java.util.Date(), "Checkup");
+        BiologicalSample newSample = new BiologicalSample();
+        newSample.setPatient(testPatient);
+        newSample.setSampleType("Urine");
+        newSample.setCollectionDate(new java.util.Date());
+        newSample.setReasonCollected("Checkup");
+
         mockMvc.perform(post("/patients/{patientId}/biological-samples", testPatient.getPatientID())
+                        .header("Authorization", userToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newSample)))
                 .andExpect(status().isOk())
@@ -86,8 +134,10 @@ public class SampleControllerTest {
     @Order(4)
     void testUpdateSample() throws Exception {
         testSample.setSampleType("Tissue");
+
         mockMvc.perform(put("/patients/{patientId}/biological-samples/{sampleId}",
                         testPatient.getPatientID(), testSample.getSampleId())
+                        .header("Authorization", adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(testSample)))
                 .andExpect(status().isOk())
@@ -98,9 +148,10 @@ public class SampleControllerTest {
     @Order(5)
     void testDeleteSample() throws Exception {
         mockMvc.perform(delete("/patients/{patientId}/biological-samples/{sampleId}",
-                        testPatient.getPatientID(), testSample.getSampleId()))
+                        testPatient.getPatientID(), testSample.getSampleId())
+                        .header("Authorization", adminToken)) // only ADMIN can delete
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString(testSample.getSampleId())));
+                .andExpect(content().string(containsString(testSample.getSampleId().toString())));
 
         Assertions.assertFalse(sampleRepo.existsById(testSample.getSampleId()));
     }

@@ -20,17 +20,17 @@ public class BiologicalSampleService {
     }
 
     // Get all samples for a patient
-    public List<BiologicalSample> getSamplesByPatientId(String patientId) {
+    public List<BiologicalSample> getSamplesByPatientId(Long patientId) {
         return sampleRepo.findByPatient_PatientID(patientId);
     }
 
     // Get a single sample by ID
-    public BiologicalSample getSampleById(String sampleId) {
+    public BiologicalSample getSampleById(Long sampleId) {
         return sampleRepo.findById(sampleId).orElse(null);
     }
 
     // Update sample
-    public BiologicalSample updateSample(String sampleId, BiologicalSample updatedSample) {
+    public BiologicalSample updateSample(Long sampleId, BiologicalSample updatedSample) {
         return sampleRepo.findById(sampleId)
             .map(sample -> {
                 sample.setSampleType(updatedSample.getSampleType());
@@ -40,7 +40,7 @@ public class BiologicalSampleService {
     }
 
      // Delete sample
-    public void deleteSample(String sampleId) {
+    public void deleteSample(Long sampleId) {
         sampleRepo.deleteById(sampleId);
     }
 

@@ -9,20 +9,19 @@ import java.util.*;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import org.hibernate.annotations.UuidGenerator;
 
 @Entity
 @Table(name = "clinical_notes")
 public class ClinicalNote {
   @Id
-  @GeneratedValue
-  @UuidGenerator
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id", updatable = false, nullable = false)
-  private String id;
+  private Long id;
   private String provider;
   private Date dateCreated;
   private String noteContent;
@@ -43,11 +42,11 @@ public class ClinicalNote {
 
 
   //getters and setters
-  public String getId() { return id; }
-  public void setId(String id) { this.id = id; }
+  public Long getId() { return id; }
+  public void setId(Long id) { this.id = id; }
   // legacy accessors kept for compatibility with existing tests
-  public String getNoteId() { return getId(); }
-  public void setNoteId(String id) { setId(id); }
+  public Long  getNoteId() { return getId(); }
+  public void setNoteId(Long id) { setId(id); }
   public Patient getPatient() {
     return patient;
   }

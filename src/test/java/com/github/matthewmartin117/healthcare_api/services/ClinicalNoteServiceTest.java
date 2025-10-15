@@ -3,13 +3,15 @@ package com.github.matthewmartin117.healthcare_api.services;
 import com.github.matthewmartin117.healthcare_api.models.ClinicalNote;
 import com.github.matthewmartin117.healthcare_api.models.Patient;
 import com.github.matthewmartin117.healthcare_api.repositories.ClinicalNoteRepository;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.*;
+import org.junit.jupiter.api.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class ClinicalNoteServiceTest {
@@ -20,75 +22,68 @@ class ClinicalNoteServiceTest {
     @InjectMocks
     private ClinicalNoteService noteService;
 
-    private ClinicalNote testNote;
     private Patient testPatient;
+    private ClinicalNote testNote;
 
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
+        testPatient = new Patient();
+        testPatient.setPatientID(1L);
 
-    testPatient = new Patient("P001", "John Doe", java.time.LocalDate.now(), new HashMap<>());
         testNote = new ClinicalNote();
-        testNote.setNoteId("N001");
-        testNote.setNoteContent("Initial note content");
+        testNote.setNoteId(100L);
         testNote.setPatient(testPatient);
+        testNote.setNoteContent("Initial content");
     }
 
     @Test
     void testCreateNote() {
         when(noteRepo.save(any(ClinicalNote.class))).thenReturn(testNote);
-
-        ClinicalNote created = noteService.createNote(testNote);
-        assertNotNull(created);
-        assertEquals("Initial note content", created.getNoteContent());
-
-        verify(noteRepo, times(1)).save(testNote);
-    }
-
-    @Test
-    void testGetNotesByPatientID() {
-        when(noteRepo.findByPatient_PatientID("P001")).thenReturn(List.of(testNote));
-
-        List<ClinicalNote> notes = noteService.getNotesByPatientID("P001");
-        assertEquals(1, notes.size());
-        assertEquals("Initial note content", notes.get(0).getNoteContent());
-
-        verify(noteRepo, times(1)).findByPatient_PatientID("P001");
+        ClinicalNote saved = noteService.createNote(testNote);
+        assertEquals("Initial content", saved.getNoteContent());
+        verify(noteRepo, times(1)).save(any(ClinicalNote.class));
     }
 
     @Test
     void testGetNoteById() {
-        when(noteRepo.findById("N001")).thenReturn(Optional.of(testNote));
+        when(noteRepo.findById(100L)).thenReturn(Optional.of(testNote));
+        ClinicalNote found = noteService.getNoteById(100L);
+        assertEquals(100L, found.getNoteId());
+        verify(noteRepo, times(1)).findById(100L);
+    }
 
-        ClinicalNote found = noteService.getNoteById("N001");
-        assertNotNull(found);
-        assertEquals("Initial note content", found.getNoteContent());
+    @Test
+    void testGetNotesForPatient() {
+        when(noteRepo.findByPatient_PatientID(testPatient.getPatientID()))
+                .thenReturn(Collections.singletonList(testNote));
 
-        verify(noteRepo, times(1)).findById("N001");
+        List<ClinicalNote> notes = noteService.getNotesByPatientID(testPatient.getPatientID());
+
+        assertEquals(1, notes.size());
+        assertEquals(testNote.getNoteContent(), notes.get(0).getNoteContent());
+        verify(noteRepo, times(1)).findByPatient_PatientID(testPatient.getPatientID());
     }
 
     @Test
     void testUpdateNote() {
-        ClinicalNote updatedNote = new ClinicalNote();
-        updatedNote.setNoteContent("Updated content");
-        updatedNote.setPatient(testPatient);
+        when(noteRepo.findById(testNote.getNoteId())).thenReturn(Optional.of(testNote));
+        when(noteRepo.save(any(ClinicalNote.class))).thenReturn(testNote);
 
-        when(noteRepo.findById("N001")).thenReturn(Optional.of(testNote));
-        when(noteRepo.save(any(ClinicalNote.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        testNote.setNoteContent("Updated content");
+        ClinicalNote updated = noteService.updateNote(testNote.getNoteId(), testNote);
 
-        ClinicalNote result = noteService.updateNote("N001", updatedNote);
-        assertEquals("Updated content", result.getNoteContent());
-
-        verify(noteRepo, times(1)).findById("N001");
-        verify(noteRepo, times(1)).save(testNote);
+        assertNotNull(updated);
+        assertEquals("Updated content", updated.getNoteContent());
+        verify(noteRepo, times(1)).save(any(ClinicalNote.class));
     }
 
     @Test
     void testDeleteNote() {
-        doNothing().when(noteRepo).deleteById("N001");
+        doNothing().when(noteRepo).deleteById(testNote.getNoteId());
 
-        noteService.deleteNote("N001");
+        noteService.deleteNote(testNote.getNoteId());
 
-        verify(noteRepo, times(1)).deleteById("N001");
+        verify(noteRepo, times(1)).deleteById(testNote.getNoteId());
     }
 }

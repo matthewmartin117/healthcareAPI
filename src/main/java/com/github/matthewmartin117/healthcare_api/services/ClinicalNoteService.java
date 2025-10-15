@@ -26,17 +26,17 @@ public class ClinicalNoteService {
   }
 
   // get all notes for a patient
-  public List<ClinicalNote> getNotesByPatientID(String patientId){
+  public List<ClinicalNote> getNotesByPatientID(Long patientId){
     return noteRepo.findByPatient_PatientID(patientId);
   }
 
   // get a single note by ID
-  public ClinicalNote getNoteById(String noteID){
+  public ClinicalNote getNoteById(Long noteID){
     return noteRepo.findById(noteID).orElse(null);
   }
 
   // update a note
-  public ClinicalNote updateNote(String noteId, ClinicalNote updatedNote){
+  public ClinicalNote updateNote(Long noteId, ClinicalNote updatedNote){
     return noteRepo.findById(noteId)
         .map(note -> {
             note.setNoteContent(updatedNote.getNoteContent());
@@ -46,7 +46,7 @@ public class ClinicalNoteService {
         .orElse(null);
   }
 
-  public void deleteNote(String noteId){
+  public void deleteNote(Long noteId){
     noteRepo.deleteById(noteId);
   }
 

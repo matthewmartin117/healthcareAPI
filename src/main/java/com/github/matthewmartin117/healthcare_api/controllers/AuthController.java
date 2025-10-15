@@ -28,6 +28,7 @@ public class AuthController {
       }
 
     @PostMapping("/login")
+    // validate username and password manually , return JWT token if valid
     public ResponseEntity<?> login(@RequestBody AuthRequest request) {
         try {
             AppUser user = userRepo.findByUsername(request.getUsername())
