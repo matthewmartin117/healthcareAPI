@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import com.github.matthewmartin117.healthcare_api.repositories.UserRepository;
 
+// load initial data into the database - used for testing purposes
 @Configuration
 public class DataLoader {
 
