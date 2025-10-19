@@ -5,7 +5,7 @@ FROM eclipse-temurin:21-jdk-alpine
 # tells docker to start at this point when executing commands
 WORKDIR /app
 
-# copy the package file from mvn into the image
+# copy copy Maven build artifact (jar file) from the host machine to the container
 COPY target/healthcare-api-0.0.1-SNAPSHOT.jar healthcare-api.jar
 
 # expose port environment variable 8080 to the outside world

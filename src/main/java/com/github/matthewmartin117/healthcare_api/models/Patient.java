@@ -3,6 +3,7 @@ import java.time.LocalDate;
 import java.util.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CollectionTable;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
@@ -31,7 +32,7 @@ public class Patient {
   private String name;
   private LocalDate dateOfBirth;
 
-  @ElementCollection
+  @ElementCollection(fetch = FetchType.EAGER)
   @CollectionTable(name = "contact_information", joinColumns = @JoinColumn(name = "patient_patientid"))
   @MapKeyColumn(name = "contact_type") // e.g. phone, email
   @Column(name = "contact_val") // e.g. actual phone number or email address
