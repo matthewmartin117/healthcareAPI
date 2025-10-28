@@ -1,4 +1,4 @@
-# use the `eclipse-temurin` image with JDK 21 on Alpine Linux
+# use the `eclipse-temurin` image with JDK 21 on Alpine Linux - OS and runtime for Java applications
 FROM eclipse-temurin:21-jdk-alpine
 
 # set the working directory in the container

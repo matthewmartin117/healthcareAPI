@@ -6,6 +6,7 @@ import com.github.matthewmartin117.healthcare_api.services.BiologicalSampleServi
 import com.github.matthewmartin117.healthcare_api.services.ClinicalNoteService;
 import com.github.matthewmartin117.healthcare_api.services.PatientService;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -127,5 +128,12 @@ public class HealthcareController {
     public String deleteSample(@PathVariable Long sampleId){
         sampleService.deleteSample(sampleId);
         return "Sample deleted: " + sampleId;
+    }
+
+    // health check endpoint
+    @GetMapping("/")
+    public String healthCheck() {
+        // Returns a simple string and a 200 OK
+        return "Application is running.";
     }
 }

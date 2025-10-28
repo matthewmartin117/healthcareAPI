@@ -1,19 +1,12 @@
-# contains list of all containers in the application
-
 services:
   db:
-    image: postgres:17
-    container_name: name
-    # service-specific environment variables
+    image: postgres:17-alpine
+    platform: linux/amd64 # Keep this if you build on an M1/M2 Mac, otherwise you can remove it
     environment:
       POSTGRES_USER: healthcare_user
       POSTGRES_PASSWORD: password
       POSTGRES_DB: healthcare_api
-    ports:
-      - "5432:5432"
-    volumes:
-      - db_data:/var/lib/postgresql/data
-      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    # No ports section needed
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U healthcare_user -d healthcare_api"]
       interval: 10s
@@ -21,18 +14,14 @@ services:
       retries: 5
 
   app:
-    build: .
-    ports:
-      - "8080:8080"
+    image: 511039171154.dkr.ecr.us-east-2.amazonaws.com/healthcare-api:latest
     environment:
-      SPRING_PROFILES_ACTIVE: postgres
+      - SPRING_PROFILES_ACTIVE=postgres
+      # You could also pass the URL here to be 100% sure
+      # - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/healthcare_api
+    ports:
+      - "8080:8080" # EB proxy will connect to this
     depends_on:
       db:
-        condition: service_healthy
-
-volumes:
-  db_data:
-
-
-
-
+        condition: service_healthy # <-- THE MAIN FIX
+    entrypoint: ["java","-jar","/app/healthcare-api.jar"]
