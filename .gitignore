@@ -9,6 +9,17 @@
 
 ### macOS
 .DS_Store
+### Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+env/
+venv/
+ENV/
+.env/
+env.bak/
+venv.bak/
 
 ### Logs
 *.log

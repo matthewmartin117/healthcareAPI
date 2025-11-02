@@ -102,9 +102,12 @@
   <artifactId>s3</artifactId>
   <version>${aws.sdk.version}</version>
 </dependency>
-</dependency>
-	</dependencies>
-
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
 	<build>
 		<plugins>

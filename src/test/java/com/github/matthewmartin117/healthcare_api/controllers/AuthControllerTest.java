@@ -18,9 +18,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.anyString;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@WithMockUser(username="admin", roles={"ADMIN"})
 public class AuthControllerTest {
 
     @Autowired
@@ -37,6 +42,9 @@ public class AuthControllerTest {
 
     @Autowired
     private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+    @MockBean
+    private com.github.matthewmartin117.healthcare_api.services.PHIRedactionService phiRedactionService;
 
     private String adminToken;
     private String userToken;
@@ -66,6 +74,8 @@ public class AuthControllerTest {
         Patient testpatient = new Patient();
         testpatient.setName("John Doe");
         savedPatient = patientRepo.save(testpatient);
+        // make PHI redactor return the original text during tests to avoid external HTTP calls
+        when(phiRedactionService.redact(anyString())).thenAnswer(inv -> inv.getArgument(0));
     }
 
     // ------------------ GET ENDPOINTS ------------------

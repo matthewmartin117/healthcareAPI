@@ -13,6 +13,19 @@ services:
       timeout: 5s
       retries: 5
 
+  phi-redactor:
+    build: ./phi_redactor_service
+    container_name: phi-redactor
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://phi-redactor:8000/redact"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   app:
     image: 511039171154.dkr.ecr.us-east-2.amazonaws.com/healthcare-api:latest
     environment:
@@ -22,6 +35,8 @@ services:
     ports:
       - "8080:8080" # EB proxy will connect to this
     depends_on:
-      db:
-        condition: service_healthy # <-- THE MAIN FIX
+      - db:
+        condition: service_healthy
+      - phi-redactor:
+        condition: service_healthy
     entrypoint: ["java","-jar","/app/healthcare-api.jar"]

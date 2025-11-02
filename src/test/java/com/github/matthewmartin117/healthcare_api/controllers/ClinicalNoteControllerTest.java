@@ -10,6 +10,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -43,6 +46,9 @@ public class ClinicalNoteControllerTest {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @MockBean
+    private com.github.matthewmartin117.healthcare_api.services.PHIRedactionService phiRedactionService;
 
     private Patient testPatient;
     private ClinicalNote testNote;
@@ -83,6 +89,8 @@ public class ClinicalNoteControllerTest {
         testNote.setPatient(testPatient);
         testNote.setNoteContent("Initial note content");
         noteRepo.save(testNote);
+        // prevent external PHI service calls during controller tests
+        when(phiRedactionService.redact(anyString())).thenAnswer(inv -> inv.getArgument(0));
     }
 
     @Test

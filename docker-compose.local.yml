@@ -14,14 +14,22 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
+  phi-redactor:
+    build: ./phi_redactor_service
+    container_name: phi-redactor
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
   app:
-    image: 511039171154.dkr.ecr.us-east-2.amazonaws.com/healthcare-api:latest
+    build: .
+    environment:
+      SPRING_PROFILES_ACTIVE: postgres
+    depends_on:
+      - db
+      - phi-redactor
     ports:
       - "8080:8080"
-    depends_on:
-      db:
-        condition: service_healthy
 
 volumes:
   db_data:

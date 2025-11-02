@@ -19,6 +19,9 @@ class ClinicalNoteServiceTest {
     @Mock
     private ClinicalNoteRepository noteRepo;
 
+    @Mock
+    private com.github.matthewmartin117.healthcare_api.services.PHIRedactionService redactionService;
+
     @InjectMocks
     private ClinicalNoteService noteService;
 
@@ -30,6 +33,9 @@ class ClinicalNoteServiceTest {
         MockitoAnnotations.openMocks(this);
         testPatient = new Patient();
         testPatient.setPatientID(1L);
+
+        // make redact return the original content so createNote doesn't set null
+        when(redactionService.redact(anyString())).thenAnswer(inv -> inv.getArgument(0));
 
         testNote = new ClinicalNote();
         testNote.setNoteId(100L);

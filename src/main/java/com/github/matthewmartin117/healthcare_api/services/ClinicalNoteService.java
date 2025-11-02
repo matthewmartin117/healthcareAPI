@@ -10,19 +10,25 @@ public class ClinicalNoteService {
 
   // use dependency injection to supply the clinical note repository
   private final ClinicalNoteRepository noteRepo;
+  private final PHIRedactionService redactionService;
 
   // use the injected for construction
-  public ClinicalNoteService(ClinicalNoteRepository noteRepo){
+  public ClinicalNoteService(ClinicalNoteRepository noteRepo, PHIRedactionService redactionService){
     this.noteRepo = noteRepo;
+    this.redactionService = redactionService;
   }
 
   // implement business logic
   // create note
+  // implement PHI redaction before saving
   public ClinicalNote createNote(ClinicalNote note){
     if (note.getPatient().getPatientID() != null ){
+      String redactedContent = redactionService.redact(note.getNoteContent());
+      note.setNoteContent(redactedContent);
     return noteRepo.save(note);
-  }
-    else {return null;}
+    } else {
+      throw new IllegalArgumentException("Patient ID cannot be null");
+    }
   }
 
   // get all notes for a patient
