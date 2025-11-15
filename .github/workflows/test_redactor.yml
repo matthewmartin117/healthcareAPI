@@ -12,13 +12,13 @@ on:
 permissions:
   contents: read
   
-env:
-  HF_TOKEN: ${{ secrets.HF_TOKEN }}
 
 jobs:
   build:
 
     runs-on: ubuntu-latest
+    env:
+     HF_TOKEN: ${{ secrets.HF_TOKEN }}
 
     steps:
     - uses: actions/checkout@v4
