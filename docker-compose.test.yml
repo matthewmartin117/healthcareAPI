@@ -1,0 +1,38 @@
+version: '3.8'
+services:
+  phi-redactor:
+    build: ./phi_redactor_service
+    container_name: phi-redactor-test
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+
+  app:
+    build: .
+    depends_on:
+      - phi-redactor
+      - db
+    ports:
+      - "8080:8080"
+
+  db:
+    image: postgres:15-alpine
+    container_name: healthcare-db-test
+    environment:
+      - POSTGRES_DB=healthcare_api
+      - POSTGRES_USER=healthcare_user
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data-test:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres-data-test:
+    driver: local

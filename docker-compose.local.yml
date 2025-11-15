@@ -1,35 +1,24 @@
-version: "3.8"
 
+version: '3.8'
 services:
-  db:
-    image: postgres:17
-    environment:
-      POSTGRES_USER: healthcare_user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: healthcare_api
-    ports:
-      - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U healthcare_user -d healthcare_api"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
   phi-redactor:
     build: ./phi_redactor_service
-    container_name: phi-redactor
+    container_name: phi-redactor-test
+    environment:
+      - PHI_REDACTOR_URL=http://phi-redactor:8000/redact
     env_file:
       - .env
     ports:
       - "8000:8000"
+
   app:
     build: .
-    environment:
-      SPRING_PROFILES_ACTIVE: postgres
+    # do not set SPRING_PROFILES_ACTIVE=postgres for tests so the app will
+    # use the embedded H2 configuration from application.properties
     depends_on:
-      - db
       - phi-redactor
     ports:
       - "8080:8080"
 
-volumes:
-  db_data:
+# no volumes required for test compose (H2 is in-memory)
+

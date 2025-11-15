@@ -15,3 +15,4 @@ EXPOSE 8080
 # the ENTRYPOINT instruction specifies a command that will always be executed when the container starts
 ENTRYPOINT ["java", "-jar", "healthcare-api.jar"]
 
+ENV SPRING_PROFILES_ACTIVE=docker

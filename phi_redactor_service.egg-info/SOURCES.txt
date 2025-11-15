@@ -1,0 +1,6 @@
+README.md
+setup.py
+phi_redactor_service.egg-info/PKG-INFO
+phi_redactor_service.egg-info/SOURCES.txt
+phi_redactor_service.egg-info/dependency_links.txt
+phi_redactor_service.egg-info/top_level.txt

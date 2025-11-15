@@ -20,11 +20,6 @@ services:
       - .env
     ports:
       - "8000:8000"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://phi-redactor:8000/redact"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   app:
     image: 511039171154.dkr.ecr.us-east-2.amazonaws.com/healthcare-api:latest
