@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   phi-redactor:
-    build: ./phi_redactor_service
+    build: ./phi_redactor
     container_name: phi-redactor-test
     env_file:
       - .env
